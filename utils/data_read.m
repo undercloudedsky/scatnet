@@ -26,19 +26,24 @@ function varargout = data_read(file,varargin)
 	end
 	
 	if length(file) > 3 && strcmpi(file(end-2:end),'.au')
-		[varargout{1},varargout{2}] = auread(file,varargin{:});
+		[varargout{1},varargout{2}] = audioread(file,varargin{:});
 	elseif length(file) > 4 && strcmpi(file(end-3:end),'.wav')
 		fid = fopen(file,'r');
 		s = textscan(fid,'%s',1);
 		fclose(fid);
 		if isempty(strfind(s{1}{1},'NIST_1A'))
-			[varargout{1},varargout{2}] = wavread(file,varargin{:});
+			[varargout{1},varargout{2}] = audioread(file,varargin{:});
 		else
 			[varargout{1},varargout{2}] = sphere_read(file,varargin{:});
 		end
 	elseif length(file) > 4 && (strcmpi(file(end-3:end),'.jpg')...
 			|| strcmpi(file(end-3:end),'.png') )
-		varargout{1} = imreadBW(file,varargin{:});
+            varargout{1} = imreadBW(file,varargin{:});
+        elseif length(file) > 4 && strcmpi(file(end-3:end),'.lst')
+            fid = fopen(file,'r');
+            formatSpec = '%d';
+            [varargout{1},varargout{2}] = fscanf(fid,formatSpec);
+            fclose(fid)
 	else
 		error('Unknown file extension!');
 	end
